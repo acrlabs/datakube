@@ -1,3 +1,7 @@
+import pandas as pd
+
+pd.options.mode.copy_on_write = True
+
 from .df_utils import partition_and_normalize
 from .df_utils import sanitize
 from .k8s_utils import fetch_pod_intervals

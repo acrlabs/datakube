@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def sanitize(df: pd.DataFrame) -> pd.DataFrame:
-    df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+    df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)
     return df
 
 
