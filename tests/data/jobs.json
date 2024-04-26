@@ -1,0 +1,2419 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-18T01:58:43Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-59f56",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "37110",
+                "uid": "a4382afe-6379-46f9-8108-b61ca59b27a7"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-nwf2w",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-nwf2w",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T02:18:15Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:58:43Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T02:18:14Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T02:18:14Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:58:43Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://06a188b57f6cc9ab3ff2abf224a32e81af9be3dbc0def056f487d00247061716",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://06a188b57f6cc9ab3ff2abf224a32e81af9be3dbc0def056f487d00247061716",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T02:18:13Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-18T01:58:44Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.34",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.34"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-18T01:58:43Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-17T23:02:46Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-6zmdk",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "9207",
+                "uid": "6e2b17db-fb6d-4748-98b5-c469fefeef9a"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-fq6fq",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-fq6fq",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:22:18Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:02:46Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:22:17Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:22:17Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:02:46Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://19635678f3b03bd09e3e6fcd8f9126b27e38e098d53e9be8d7958bd60dfeb7be",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://19635678f3b03bd09e3e6fcd8f9126b27e38e098d53e9be8d7958bd60dfeb7be",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-17T23:22:16Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-17T23:02:47Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.25",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.25"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-17T23:02:46Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-17T23:41:52Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-cnzwj",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "15429",
+                "uid": "78a7c191-74b7-44d7-8d2f-0a26f0f60fa7"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-rvmg9",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-rvmg9",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:01:24Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:41:52Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:01:23Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:01:23Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:41:52Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://9033959b665593f9aff645de539f6c5bc8445c7702cf68e866ac237a268593f6",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://9033959b665593f9aff645de539f6c5bc8445c7702cf68e866ac237a268593f6",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T00:01:22Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-17T23:41:52Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.27",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.27"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-17T23:41:52Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-17T23:22:19Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-fdwg5",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "12320",
+                "uid": "95da34bf-536a-46d6-a1eb-380e8d781437"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-5vjr5",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-5vjr5",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:41:51Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:22:19Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:41:50Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:41:50Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-17T23:22:19Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://84df0057a09ebc6d49313ffbebebc91b29777db5918486c204e8d91c860bd679",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://84df0057a09ebc6d49313ffbebebc91b29777db5918486c204e8d91c860bd679",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-17T23:41:49Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-17T23:22:19Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.26",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.26"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-17T23:22:19Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-18T01:19:37Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-ftjqz",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "30940",
+                "uid": "2e5cfa39-45fa-4953-a8ab-4e5eecbaa052"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-kx9hl",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-kx9hl",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:39:09Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:19:37Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:39:08Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:39:08Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:19:37Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://75dd3a2be3ffa61104c8cf4be224f69e4014a7fcc429a10bb6ce2f3435b368c4",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://75dd3a2be3ffa61104c8cf4be224f69e4014a7fcc429a10bb6ce2f3435b368c4",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T01:39:07Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-18T01:19:37Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.32",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.32"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-18T01:19:37Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-18T00:40:31Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-ggrrf",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "24753",
+                "uid": "fb926755-78f7-4603-9044-d9a33a8259be"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-r7s7t",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-r7s7t",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:00:03Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:40:31Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:00:02Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:00:02Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:40:31Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://aeefae9d8327662bd0ad7edf4d18312191154af72e5daab5d42b9a9845f93911",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://aeefae9d8327662bd0ad7edf4d18312191154af72e5daab5d42b9a9845f93911",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T01:00:01Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-18T00:40:31Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.30",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.30"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-18T00:40:31Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-18T01:39:10Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-kjgn8",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "34011",
+                "uid": "4b738cbd-bc5f-429e-a79a-9e4b58001ac2"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-pks8s",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-pks8s",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:58:42Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:39:10Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:58:41Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:58:41Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:39:10Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://d1a76e9739309ba4b9927c4bc24acc17b2433da6c58e3f2efff32f0d00d5c223",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://d1a76e9739309ba4b9927c4bc24acc17b2433da6c58e3f2efff32f0d00d5c223",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T01:58:40Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-18T01:39:11Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.33",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.33"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-18T01:39:10Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-18T01:00:04Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-nxd7d",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "27839",
+                "uid": "192ce458-52f2-43f6-a468-5fe4bb8f077d"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-dq5qm",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-dq5qm",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:19:36Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:00:04Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:19:35Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:19:35Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T01:00:04Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://a7c5ab8cd6d88ff5574ee24e44dc4189536781ff61cfe28f0d5bc6aa62389d7b",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://a7c5ab8cd6d88ff5574ee24e44dc4189536781ff61cfe28f0d5bc6aa62389d7b",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T01:19:34Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-18T01:00:04Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.31",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.31"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-18T01:00:04Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-18T00:20:58Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-ppxb9",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "21647",
+                "uid": "c996b3a8-5da0-4a54-87be-749743697319"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-8k4m6",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-8k4m6",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:40:30Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:20:58Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:40:29Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:40:29Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:20:58Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://7c24e0445de001b5f2674ca36642ffe9b2c44e7d8db7dca692e4ebad03d0566d",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://7c24e0445de001b5f2674ca36642ffe9b2c44e7d8db7dca692e4ebad03d0566d",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T00:40:28Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-18T00:20:58Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.29",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.29"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-18T00:20:58Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "creationTimestamp": "2024-04-18T00:01:25Z",
+                "generateName": "sk-dsb-sn-static-driver-",
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "batch.kubernetes.io/job-name": "sk-dsb-sn-static-driver",
+                    "controller-uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f",
+                    "job-name": "sk-dsb-sn-static-driver"
+                },
+                "name": "sk-dsb-sn-static-driver-r4rs7",
+                "namespace": "simkube",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Job",
+                        "name": "sk-dsb-sn-static-driver",
+                        "uid": "49359ad7-2a81-4fd1-8836-2e50387f3a8f"
+                    }
+                ],
+                "resourceVersion": "18541",
+                "uid": "c6e6d0ef-3fa0-4814-8ad9-a0e4de396906"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "args": [
+                            "--cert-path",
+                            "/etc/ssl//tls.crt",
+                            "--key-path",
+                            "/etc/ssl//tls.key",
+                            "--trace-mount-path",
+                            "/data/trace",
+                            "--virtual-ns-prefix",
+                            "virtual",
+                            "--sim-name",
+                            "dsb-sn-static",
+                            "--verbosity",
+                            "info",
+                            "--controller-ns",
+                            "simkube"
+                        ],
+                        "command": [
+                            "/sk-driver"
+                        ],
+                        "env": [
+                            {
+                                "name": "RUST_BACKTRACE",
+                                "value": "1"
+                            },
+                            {
+                                "name": "DRIVER_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "driver",
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/data/trace",
+                                "name": "trace-data"
+                            },
+                            {
+                                "mountPath": "/etc/ssl/",
+                                "name": "driver-cert"
+                            },
+                            {
+                                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                                "name": "kube-api-access-t48w2",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "static-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "serviceAccount": "sk-ctrl-sa",
+                "serviceAccountName": "sk-ctrl-sa",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "hostPath": {
+                            "path": "/data/trace",
+                            "type": "File"
+                        },
+                        "name": "trace-data"
+                    },
+                    {
+                        "name": "driver-cert",
+                        "secret": {
+                            "defaultMode": 384,
+                            "secretName": "sk-driver-cert"
+                        }
+                    },
+                    {
+                        "name": "kube-api-access-t48w2",
+                        "projected": {
+                            "defaultMode": 420,
+                            "sources": [
+                                {
+                                    "serviceAccountToken": {
+                                        "expirationSeconds": 3607,
+                                        "path": "token"
+                                    }
+                                },
+                                {
+                                    "configMap": {
+                                        "items": [
+                                            {
+                                                "key": "ca.crt",
+                                                "path": "ca.crt"
+                                            }
+                                        ],
+                                        "name": "kube-root-ca.crt"
+                                    }
+                                },
+                                {
+                                    "downwardAPI": {
+                                        "items": [
+                                            {
+                                                "fieldRef": {
+                                                    "apiVersion": "v1",
+                                                    "fieldPath": "metadata.namespace"
+                                                },
+                                                "path": "namespace"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:20:57Z",
+                        "status": "False",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:01:25Z",
+                        "reason": "PodCompleted",
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:20:56Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:20:56Z",
+                        "reason": "PodCompleted",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2024-04-18T00:01:25Z",
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "containerID": "containerd://d0541cc9ff265f01f9c9d120a14db5ba2f24ed7813fca5092734e8fa5f3b1804",
+                        "image": "localhost:5000/sk-driver:4ebc0d4-14e29bf98f7ba290c6d1d82592995ec15c45f6b7",
+                        "imageID": "localhost:5000/sk-driver@sha256:d7abfd40d887746991af714262ad64f6f6fe6a11cce015d5f1bf9b6e49c0647e",
+                        "lastState": {},
+                        "name": "driver",
+                        "ready": false,
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://d0541cc9ff265f01f9c9d120a14db5ba2f24ed7813fca5092734e8fa5f3b1804",
+                                "exitCode": 0,
+                                "finishedAt": "2024-04-18T00:20:55Z",
+                                "reason": "Completed",
+                                "startedAt": "2024-04-18T00:01:25Z"
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.19.0.3",
+                "hostIPs": [
+                    {
+                        "ip": "172.19.0.3"
+                    }
+                ],
+                "phase": "Succeeded",
+                "podIP": "10.244.1.28",
+                "podIPs": [
+                    {
+                        "ip": "10.244.1.28"
+                    }
+                ],
+                "qosClass": "BestEffort",
+                "startTime": "2024-04-18T00:01:25Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

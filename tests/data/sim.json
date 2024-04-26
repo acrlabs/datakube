@@ -1,0 +1,41 @@
+{
+    "apiVersion": "simkube.io/v1",
+    "kind": "Simulation",
+    "metadata": {
+        "creationTimestamp": "2024-04-17T23:02:21Z",
+        "generation": 1,
+        "name": "dsb-sn-static",
+        "resourceVersion": "37116",
+        "uid": "74f831bd-d152-468e-950a-82ebfc206088"
+    },
+    "spec": {
+        "driverNamespace": "simkube",
+        "duration": null,
+        "metricsConfig": {
+            "namespace": "monitoring",
+            "podMonitorNames": null,
+            "podMonitorNamespaces": [
+                "monitoring-hd"
+            ],
+            "prometheusShards": null,
+            "remoteWriteConfigs": [
+                {
+                    "url": "http://prom2parquet-svc:1234/receive"
+                }
+            ],
+            "serviceAccount": "prometheus-k8s",
+            "serviceMonitorNames": null,
+            "serviceMonitorNamespaces": [
+                "monitoring-hd"
+            ]
+        },
+        "repetitions": 10,
+        "tracePath": "file:///data/trace"
+    },
+    "status": {
+        "endTime": "2024-04-18T02:18:16Z",
+        "observedGeneration": 1,
+        "startTime": "2024-04-17T23:02:46Z",
+        "state": "Finished"
+    }
+}
