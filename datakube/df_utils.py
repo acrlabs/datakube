@@ -19,3 +19,11 @@ def partition_and_normalize(
         partitions.append(partition)
 
     return partitions
+
+
+def extract_labels_to_columns(df: pd.DataFrame, labels: T.List[str]) -> pd.DataFrame:
+    # non-greedy match, terminate the match after the first comma or end of string
+    new_df = df
+    for label in labels:
+        new_df[label] = df["labels"].str.extract(f"{label}=(.*?)(?:,|$)")
+    return new_df
