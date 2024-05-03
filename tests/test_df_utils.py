@@ -16,8 +16,8 @@ def df() -> pd.DataFrame:
 
 
 def test_normalized_df_timestamp_range(df):
-    split1 = (pd.Timestamp(11000, unit="ms"), pd.Timestamp(13000, unit="ms"))
-    split2 = (pd.Timestamp(15000, unit="ms"), pd.Timestamp(18000, unit="ms"))
+    split1 = (pd.Timestamp(11000, unit="ms", tz="UTC"), pd.Timestamp(13000, unit="ms", tz="UTC"))
+    split2 = (pd.Timestamp(15000, unit="ms", tz="UTC"), pd.Timestamp(18000, unit="ms", tz="UTC"))
     res = partition_and_normalize(df, [split1, split2])
 
     assert len(res) == 2
@@ -25,14 +25,14 @@ def test_normalized_df_timestamp_range(df):
     assert len(res[1]) == 4
 
     pd.testing.assert_series_equal(
-        res[0]["normalized_ts"],
-        pd.Series([pd.Timedelta(v, unit="s") for v in range(3)]),
+        res[0].index.to_series(),
+        pd.Series(range(3)),
         check_index=False,
         check_names=False,
     )
     pd.testing.assert_series_equal(
-        res[1]["normalized_ts"],
-        pd.Series([pd.Timedelta(v, unit="s") for v in range(4)]),
+        res[1].index.to_series(),
+        pd.Series(range(4)),
         check_index=False,
         check_names=False,
     )

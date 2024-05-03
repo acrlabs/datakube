@@ -1,3 +1,5 @@
+import typing as T
+
 import pandas as pd
 from bokeh.models import ColumnDataSource
 from bokeh.models import NumeralTickFormatter
@@ -27,7 +29,15 @@ def new_figure() -> figure:
 def plot_multiseries(df: pd.DataFrame, stack: bool = False) -> None:
     p = new_figure()
     src = ColumnDataSource(df)
-    _add_ts_lines(src, p)
+    keys = list(df.columns)
+    ncolors = min(max(len(keys), _MIN_PALETTE_SIZE), _MAX_PALETTE_SIZE)
+    colors = tol[_PALETTE_NAME][ncolors][: len(keys)]
+
+    if not stack:
+        _add_ts_lines(src, keys, p, colors)
+    else:
+        p.vline_stack(keys, x=NORM_TS_KEY, color=colors, source=src)
+
     show(p)
 
 
@@ -35,11 +45,10 @@ def plot_multiseries(df: pd.DataFrame, stack: bool = False) -> None:
 #     pass
 
 
-def _add_ts_lines(src: ColumnDataSource, p: figure) -> None:
-    ncolors = min(max(len(src.data) - 1, _MIN_PALETTE_SIZE), _MAX_PALETTE_SIZE)
-    colors = iter(tol[_PALETTE_NAME][ncolors])
+def _add_ts_lines(src: ColumnDataSource, keys: T.List[str], p: figure, colors: T.Tuple[str, ...]) -> None:
+    color_iter = iter(colors)
     for key in src.data.keys():
         if key == NORM_TS_KEY:
             continue
 
-        p.line(x=NORM_TS_KEY, y=key, source=src, color=next(colors))
+        p.line(x=NORM_TS_KEY, y=key, source=src, color=next(color_iter))
