@@ -1,8 +1,10 @@
 import typing as T
 
 import pandas as pd
+from bokeh.layouts import gridplot
 from bokeh.models import ColumnDataSource
 from bokeh.models import NumeralTickFormatter
+from bokeh.palettes import inferno
 from bokeh.palettes import tol
 from bokeh.plotting import figure
 from bokeh.plotting import show
@@ -15,7 +17,7 @@ _MAX_PALETTE_SIZE = 23
 
 
 def new_figure() -> figure:
-    p = figure(sizing_mode="stretch_width", height=600, tools="")
+    p = figure(height=600, tools="")
     p.xgrid.visible = False
     p.ygrid.visible = False
     p.axis.minor_tick_line_color = None
@@ -26,19 +28,33 @@ def new_figure() -> figure:
     return p
 
 
-def plot_multiseries(df: pd.DataFrame, stack: bool = False) -> None:
-    p = new_figure()
-    src = ColumnDataSource(df)
-    keys = list(df.columns)
-    ncolors = min(max(len(keys), _MIN_PALETTE_SIZE), _MAX_PALETTE_SIZE)
-    colors = tol[_PALETTE_NAME][ncolors][: len(keys)]
+def plot_multiseries(dfs: T.Union[pd.DataFrame, T.List[pd.DataFrame]], stack: bool = False, ncols: int = 3) -> None:
+    if isinstance(dfs, pd.DataFrame):
+        dfs = [dfs]
 
-    if not stack:
-        _add_ts_lines(src, keys, p, colors)
-    else:
-        p.vline_stack(keys, x=NORM_TS_KEY, color=colors, source=src)
+    plots = []
+    for df in dfs:
+        p = new_figure()
+        src = ColumnDataSource(df)
+        keys = list(df.columns)
 
-    show(p)
+        ncolors = max(len(keys), _MIN_PALETTE_SIZE)
+        if ncolors > _MAX_PALETTE_SIZE:
+            colors = inferno(ncolors)
+        else:
+            colors = tol[_PALETTE_NAME][ncolors][: len(keys)]
+
+        if not stack:
+            _add_ts_lines(src, keys, p, colors)
+        else:
+            p.vline_stack(keys, x=NORM_TS_KEY, color=colors, source=src)
+
+        plots.append(p)
+
+    ncols = min(ncols, len(dfs))
+    grid = gridplot(plots, ncols=ncols, sizing_mode="stretch_width")  # type: ignore
+
+    show(grid)
 
 
 # def plot_aggregated_timeseries(df: pd.DataFrame):
