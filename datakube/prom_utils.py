@@ -1,16 +1,16 @@
 import os
 import re
 
-import boto3
 import pandas as pd
 
 from datakube.df_utils import extract_labels_to_columns
+
+CACHED_PARQUET_FILE = "cache.parquet"
 
 
 class PromReader:
     def __init__(self, data_path: str, cache_root: str = "~/.cache/datakube") -> None:
         self.cache_root = os.path.expanduser(cache_root)
-        self.s3 = boto3.client("s3")
         self.cache_enabled = True
         self.data_path = data_path
 
@@ -20,21 +20,15 @@ class PromReader:
         if path_parts and self.cache_enabled:
             bucket = path_parts.group(1)
             prefix = path_parts.group(2)
-            cached_location = f"{self.cache_root}/{bucket}"
+            cached_location = f"{self.cache_root}/{bucket}/{prefix}"
 
-            paginator = self.s3.get_paginator("list_objects_v2")
-            for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
-                for obj in page["Contents"]:
-                    full_path = f"{cached_location}/{obj['Key']}"
-                    if not os.path.exists(full_path):
-                        d = os.path.dirname(obj["Key"])
-                        os.makedirs(f"{cached_location}/{d}", exist_ok=True)
+            if os.path.exists(cached_location):
+                return pd.read_parquet(cached_location)
 
-                        resp = self.s3.get_object(Bucket=bucket, Key=obj["Key"])
-                        with open(full_path, "wb") as f:
-                            f.write(resp["Body"].read())
-
-            return pd.read_parquet(f"{cached_location}/{prefix}")
+            df = pd.read_parquet(path)
+            os.makedirs(cached_location, exist_ok=True)
+            df.to_parquet(f"{cached_location}/{CACHED_PARQUET_FILE}")
+            return df
 
         return pd.read_parquet(path)
 

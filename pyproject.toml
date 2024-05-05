@@ -15,7 +15,6 @@ simplejson = "^3.19.2"
 types-simplejson = "^3.19.0.20240310"
 ipykernel = "^6.29.4"
 bokeh = "^3.4.1"
-boto3 = "^1.34.98"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.10.0"
