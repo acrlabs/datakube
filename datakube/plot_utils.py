@@ -1,5 +1,6 @@
 import typing as T
 
+import numpy as np
 import pandas as pd
 from bokeh.layouts import gridplot
 from bokeh.models import ColumnDataSource
@@ -21,20 +22,27 @@ def new_figure() -> figure:
     p.xgrid.visible = False
     p.ygrid.visible = False
     p.axis.minor_tick_line_color = None
-    p.xaxis.formatter = NumeralTickFormatter(format="00:00:00")
     p.y_range.start = 0  # type: ignore
     p.toolbar_location = None  # type: ignore
 
     return p
 
 
-def plot_multiseries(dfs: T.Union[pd.DataFrame, T.List[pd.DataFrame]], stack: bool = False, ncols: int = 3) -> None:
-    if isinstance(dfs, pd.DataFrame):
-        dfs = [dfs]
+def plot_histogram(counts: np.ndarray, bins: np.ndarray) -> None:
+    p = new_figure()
+    p.x_range.start = 0  # type: ignore
+    p.xaxis.ticker = bins
+    p.quad(top=counts, left=bins[:-1], right=bins[1:], bottom=0)
+    show(p)
 
+
+def plot_multiseries(dfs: T.Mapping[str, pd.DataFrame], *, stack: bool = False, ncols: int = 3) -> None:
     plots = []
-    for df in dfs:
+    for title, df in dfs.items():
         p = new_figure()
+        p.title.text = title  # type: ignore
+        p.xaxis.formatter = NumeralTickFormatter(format="00:00:00")
+
         src = ColumnDataSource(df)
         keys = list(df.columns)
 
@@ -55,10 +63,6 @@ def plot_multiseries(dfs: T.Union[pd.DataFrame, T.List[pd.DataFrame]], stack: bo
     grid = gridplot(plots, ncols=ncols, sizing_mode="stretch_width")  # type: ignore
 
     show(grid)
-
-
-# def plot_aggregated_timeseries(df: pd.DataFrame):
-#     pass
 
 
 def _add_ts_lines(src: ColumnDataSource, keys: T.List[str], p: figure, colors: T.Tuple[str, ...]) -> None:
