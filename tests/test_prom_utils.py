@@ -1,6 +1,7 @@
-from datakube.prom_utils import compute_pod_owners_map
+from datakube.prom_utils import PromReader
 
 
 def test_compute_pod_owners_map() -> None:
-    df = compute_pod_owners_map("./tests/data")
+    reader = PromReader("./tests/data")
+    df = reader.compute_pod_owners_map()
     assert len(df) == 193
