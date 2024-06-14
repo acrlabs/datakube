@@ -9,7 +9,11 @@ from datakube.constants import VALUE_KEY
 Extents = T.Tuple[float, float, float, float]
 
 
-def aggregate_timeseries(dfs: T.List[pd.DataFrame], key_prefix: str, aggfunc: str = "sum") -> pd.DataFrame:
+def aggregate_timeseries(
+    dfs: T.List[pd.DataFrame],
+    key_prefix: str,
+    aggfunc: T.Union[str, T.Callable] = "sum",
+) -> pd.DataFrame:
     data, keys = [], []
     for i, df in enumerate(dfs):
         data.append(df[VALUE_KEY].groupby(level=0).aggregate(aggfunc))
@@ -51,7 +55,7 @@ def delta_histogram(
     lower: float = 0,
     baseline: float = 0,
 ) -> T.Tuple[np.ndarray, np.ndarray]:
-    deltas = df.diff()
+    deltas = counter_diff(df)
     all_non_zero_deltas = T.cast(
         pd.Series,
         pd.concat(
