@@ -5,6 +5,8 @@ pd.options.mode.copy_on_write = True
 output_notebook()
 
 from .df_utils import aggregate_timeseries
+from .df_utils import compute_extents
+from .df_utils import counter_diff
 from .df_utils import delta_histogram
 from .df_utils import extract_labels_to_columns
 from .df_utils import partition_and_normalize
@@ -18,6 +20,8 @@ from .prom_utils import PromReader
 
 __all__ = [
     "aggregate_timeseries",
+    "compute_extents",
+    "counter_diff",
     "delta_histogram",
     "extract_labels_to_columns",
     "fetch_pod_intervals",

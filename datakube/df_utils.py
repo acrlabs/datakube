@@ -34,6 +34,16 @@ def compute_extents(df: pd.DataFrame, stack: bool = False) -> Extents:
     return (xmin, xmax, ymin, ymax)
 
 
+def counter_diff(df: pd.DataFrame) -> pd.DataFrame:
+    # If the counter resets, we get a negative value, and then the diffs from then on are the same.
+    # In this case, we just assume that the adjacent values when the counter reset were equal, and
+    # thus the diff is 0 at that index; this could possibly be a bad assumption but I don't know of
+    # a better one to make.
+    df_diff = df.diff()
+    df_diff[df_diff < 0] = 0
+    return df_diff
+
+
 def delta_histogram(
     df: pd.DataFrame,
     *,
