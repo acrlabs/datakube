@@ -4,9 +4,12 @@ repos:
     rev: v4.4.0
     hooks:
       - id: end-of-file-fixer
-      - id: check-yaml
-        args: ["--allow-multiple-documents"]
       - id: trailing-whitespace
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ['--strict', '-d', '{extends: default, rules: {line-length: {max: 120}}}']
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.4.1
     hooks:
