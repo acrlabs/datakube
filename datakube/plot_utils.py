@@ -1,4 +1,5 @@
 import typing as T
+from datetime import timedelta
 
 import numpy as np
 import pandas as pd
@@ -15,8 +16,6 @@ from bokeh.palettes import inferno
 from bokeh.palettes import tol
 from bokeh.plotting import figure
 from bokeh.plotting import show
-
-from datakube.df_utils import compute_extents
 
 _PALETTE_NAME = "TolRainbow"
 _MIN_PALETTE_SIZE = 3
@@ -37,6 +36,8 @@ export default (args, obj, data, context) => {
     obj.tooltips = tooltips.join("<br>");
 }
 """
+
+Extents = T.Tuple[timedelta, timedelta, float, float]
 
 
 def new_figure(h: int = 600) -> figure:
@@ -64,7 +65,7 @@ def plot_multiseries(dfs: T.Mapping[str, pd.DataFrame], *, stack: bool = False, 
         p.title.text = title  # type: ignore
         p.xaxis.formatter = NumeralTickFormatter(format="00:00:00")
 
-        (xmin, xmax, ymin, ymax) = compute_extents(df, stack=stack)
+        (xmin, xmax, ymin, ymax) = _compute_extents(df, stack=stack)
         p.x_range = Range1d(xmin, xmax * 1.05)  # type: ignore
         p.y_range = Range1d(ymin, ymax * 1.05)  # type: ignore
         src = ColumnDataSource(df)
@@ -96,13 +97,26 @@ def _add_ts_lines(src: ColumnDataSource, index: str, keys: T.List[str], p: figur
         p.line(x=index, y=key, source=src, color=next(color_iter))
 
 
+def _compute_extents(df: pd.DataFrame, stack: bool = False) -> Extents:
+    xmin, xmax = df.index.min(), df.index.max()
+
+    # first min (max) gets the min (max) of each column, second reduces to min (max) of all columns
+    ymin = min(0, df.min().min())
+    if stack:
+        ymax = df.sum(axis=1).max()
+    else:
+        ymax = df.max().max()
+
+    return (xmin, xmax, ymin, ymax)
+
+
 def _setup_ts_tools(
     src: ColumnDataSource,
     index: str,
     p: figure,
     colors: T.Tuple[str, ...],
-    xmin: float,
-    xmax: float,
+    xmin: timedelta,
+    xmax: timedelta,
     ymin: float,
     ymax: float,
 ) -> None:
@@ -121,7 +135,7 @@ def _setup_ts_tools(
     # instead of just when it's hovering over a line
     xmargin = xmax * _MARGIN_FACTOR
     ymargin = ymax * _MARGIN_FACTOR
-    q = p.quad(left=xmin - ymargin, right=xmax + xmargin, bottom=ymin - ymargin, top=ymax + ymargin, alpha=0)
+    q = p.quad(left=xmin - xmargin, right=xmax + xmargin, bottom=ymin - ymargin, top=ymax + ymargin, alpha=0)
     hover.renderers = [q]  # type: ignore
 
     # The box zoom tool lets you zoom in to a particular time window, a la grafana
