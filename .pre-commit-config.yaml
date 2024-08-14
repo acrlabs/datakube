@@ -14,7 +14,7 @@ repos:
     rev: v1.4.1
     hooks:
       - id: mypy
-        additional_dependencies: [types-simplejson]
+        additional_dependencies: [types-simplejson, pandas-stubs]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.2
     hooks:

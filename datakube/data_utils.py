@@ -21,16 +21,29 @@ class Comparison(Enum):
 
 
 class DataKubeRelation:
-    def __init__(self, rel: DuckDBPyRelation, conn: DuckDBPyConnection):
+    def __init__(self, rel: DuckDBPyRelation, conn: DuckDBPyConnection, grouper: T.Optional[str]):
         self._rel = rel
         self._conn = conn
+        self._grouper = grouper
+
+    def copy(self) -> "DataKubeRelation":
+        return DataKubeRelation(self._rel, self._conn, self._grouper)
 
     def df(self) -> pd.DataFrame:
         return self._rel.df()
 
-    def fill_missing_data(self, grouper: str, window_size: int = 3) -> T.Self:
+    def extract_label(self, key: str, col_name: T.Optional[str] = None) -> T.Self:
+        if col_name is None:
+            col_name = key
+        self._rel = self._rel.select(f"*, regexp_extract(labels, '{key}=(.*?)(?:,|$)', 1) AS {col_name}")
+        return self
+
+    def fill_missing_data(self, window_size: int = 3) -> T.Self:
+        if not self._grouper:
+            raise ValueError("Group-by field required")
+
         self._rel = self._rel.select(
-            "time_bucket(INTERVAL '1s', to_timestamp(timestamp / 1000)) AS rounded_ts, *",
+            "time_bucket(INTERVAL '1s', timestamp) AS timestamp, * EXCLUDE (timestamp)",
         ).query(
             "rounded_times",
             # We're using native SQL here instead of the relation API because it's (I think) a little
@@ -39,7 +52,7 @@ class DataKubeRelation:
             # in any "missing" data from the raw timeseries data:
             #
             # 1. First we find the minimum and maximum time values for each unique element (say, each pod)
-            # 2. Then we gnerate the "complete" list of timestamps between those min and max time values per element
+            # 2. Then we generate the "complete" list of timestamps between those min and max time values per element
             # 3. We join the "complete" list of timestamps with the existing (normalized) data; we LEFT JOIN
             #    so that any missing data points will appear with NULL values in the result
             # 4. Lastly, we window the data and take the last not null value that we find (essentially, as long as
@@ -48,24 +61,24 @@ class DataKubeRelation:
             #    example).
             f"""
             WITH time_ranges AS (
-                SELECT min(rounded_ts) as mints, max(rounded_ts) as maxts, {grouper},
-                FROM rounded_times GROUP BY {grouper}
+                SELECT min(timestamp) as mints, max(timestamp) as maxts, {self._grouper},
+                FROM rounded_times GROUP BY {self._grouper}
             ), all_timestamps AS (
                 SELECT unnest(generate_series(mints::timestamptz, maxts::timestamptz, INTERVAL '1s')) AS timestamp,
-                    {grouper},
+                    {self._grouper},
                 FROM time_ranges
             ), joined_timestamps AS (
-                SELECT a.timestamp, a.{grouper}, r.value, r.labels,
+                SELECT a.timestamp, a.{self._grouper}, r.value, r.labels,
                 FROM all_timestamps a LEFT JOIN rounded_times r
-                ON a.timestamp = r.rounded_ts AND a.{grouper} = r.{grouper}
+                USING (timestamp, {self._grouper})
             )
 
-            SELECT timestamp, {grouper},
+            SELECT timestamp, {self._grouper},
                 last_value(value IGNORE NULLS) OVER group_window AS value,
                 last_value(labels IGNORE NULLS) OVER group_window AS labels,
             FROM joined_timestamps
             WINDOW group_window AS (
-                PARTITION BY {grouper}
+                PARTITION BY {self._grouper}
                 ORDER BY timestamp
                 ROWS BETWEEN {window_size} PRECEDING AND CURRENT ROW
             )
@@ -79,20 +92,34 @@ class DataKubeRelation:
         prefix: str = "sim",
     ) -> T.Self:
         cases = "".join([
-            f"WHEN timestamp BETWEEN '{start}' AND '{end}' THEN '{prefix}.{i}'" for i, (start, end) in enumerate(splits)
+            f"""
+            WHEN timestamp BETWEEN '{start}' AND '{end}'
+            THEN {{'{prefix}': '{prefix}.{i}', 'start': CAST('{start}' AS TIMESTAMP WITH TIME ZONE)}}
+            """
+            for i, (start, end) in enumerate(splits)
         ])
-        self._rel = self._rel.select(f""" *,
-            CASE {cases} END AS {prefix},
-            timestamp - min(timestamp) OVER (PARTITION BY {prefix} ORDER BY timestamp) AS {NORM_TS_KEY},
-        """)
+        self._rel = self._rel.select(f"*, CASE {cases} END AS s").select(
+            f"""
+            *,
+            s.{prefix} AS {prefix},
+            s.start AS start,
+            timestamp - start AS {NORM_TS_KEY},
+            """
+        )
         return self
+
+    def split(self, on: str = "sim") -> T.Mapping[str, "DataKubeRelation"]:
+        return {
+            value[0]: DataKubeRelation(self._rel.filter(f"{on}='{value[0]}'"), self._conn, self._grouper)
+            for value in self._rel.unique(on).sort(on).fetchall()
+        }
 
     def to_pivot_table(
         self,
         column: str = "sim",
         aggfunc: str = "sum",
         max_time: T.Optional[timedelta] = None,
-        fill_value: T.Optional[float] = None,
+        fill_value: T.Optional[float] = 0.0,
     ) -> pd.DataFrame:
         if max_time is None:
             max_time = self._rel.max(NORM_TS_KEY).fetchone()[0]
@@ -117,8 +144,16 @@ class DataKubeRelation:
 
         return df
 
+    def with_any_container(self) -> T.Self:
+        self._rel = self._rel.filter("container != ''")
+        return self
+
     def with_label(self, key: str, value: str) -> T.Self:
         self._rel = self._rel.filter(f"labels LIKE '%{key}={value}%'")
+        return self
+
+    def with_pod_prefix(self, prefix: str) -> T.Self:
+        self._rel = self._rel.filter(f"pod LIKE '{prefix}%'")
         return self
 
     def with_namespace(self, ns: str) -> T.Self:

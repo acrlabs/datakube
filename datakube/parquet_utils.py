@@ -31,15 +31,12 @@ class PromReader:
             t[0] for t in self._conn.query("SELECT table_name FROM duckdb_tables").fetchall()
         ])
 
-    def query_metric(self, metric_name: str, filters: T.List[str] = list()) -> DuckDBPyRelation:
+    def query_metric(self, metric_name: str, grouper: T.Optional[str] = None) -> DuckDBPyRelation:
         if metric_name not in self._tables:
             self._load_metric_from_parquet(metric_name)
 
-        rel = self._conn.table(metric_name)
-        for f in filters:
-            rel = rel.filter(f)
-
-        return DataKubeRelation(rel, self._conn)
+        rel = self._conn.table(metric_name).select("* EXCLUDE(timestamp), to_timestamp(timestamp / 1000) AS timestamp")
+        return DataKubeRelation(rel, self._conn, grouper)
 
     def _load_metric_from_parquet(self, metric_name: str):
         # Hmmmmm.... we can't use parameter binding for these things so I guess this is vulnerable
