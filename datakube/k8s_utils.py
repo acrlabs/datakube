@@ -1,6 +1,6 @@
 import typing as T
 
-import pandas as pd
+import arrow
 import simplejson as json
 from kubernetes.client import V1PodList
 from kubernetes.client.api_client import ApiClient
@@ -13,7 +13,7 @@ def read_obj_from_json(filename: str, klass: str) -> T.Any:
     return client._ApiClient__deserialize(data, klass)  # type: ignore
 
 
-def fetch_pod_intervals(pods: V1PodList) -> T.List[T.Tuple[pd.Timestamp, pd.Timestamp]]:
+def fetch_pod_intervals(pods: V1PodList) -> T.List[T.Tuple[arrow.Arrow, arrow.Arrow]]:
     intervals = []
     for pod in pods.items:
         assert pod.status
@@ -33,6 +33,6 @@ def fetch_pod_intervals(pods: V1PodList) -> T.List[T.Tuple[pd.Timestamp, pd.Time
         assert start
         assert end
 
-        intervals.append((pd.Timestamp(start), pd.Timestamp(end)))
+        intervals.append((arrow.get(start), arrow.get(end)))
 
     return sorted(intervals)
