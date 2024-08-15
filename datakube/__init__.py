@@ -9,10 +9,10 @@ from .data_utils import counter_diff
 from .data_utils import delta_histogram
 from .k8s_utils import fetch_pod_intervals
 from .k8s_utils import read_obj_from_json
-from .parquet_utils import PromReader
 from .plot_utils import new_figure
 from .plot_utils import plot_histogram
 from .plot_utils import plot_multiseries
+from .prom_utils import PromReader
 
 __all__ = [
     "counter_diff",

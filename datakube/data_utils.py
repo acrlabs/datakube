@@ -111,7 +111,7 @@ class DataKubeRelation:
     def split(self, on: str = "sim") -> T.Mapping[str, "DataKubeRelation"]:
         return {
             value[0]: DataKubeRelation(self._rel.filter(f"{on}='{value[0]}'"), self._conn, self._grouper)
-            for value in self._rel.unique(on).sort(on).fetchall()
+            for value in self._rel.filter(f"{on} IS NOT NULL").unique(on).sort(on).fetchall()
         }
 
     def to_pivot_table(
