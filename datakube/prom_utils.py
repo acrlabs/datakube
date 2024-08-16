@@ -20,7 +20,9 @@ class PromReader:
         if path_parts and cache_enabled:
             bucket = path_parts.group(1)
             prefix = path_parts.group(2)
-            db_location = f"{cache_root}/{bucket}/{prefix}/{CACHED_DB_FILE}"
+            cache_location = f"{cache_root}/{bucket}/{prefix}/"
+            os.makedirs(cache_location, exist_ok=True)
+            db_location = f"{cache_location}/{CACHED_DB_FILE}"
 
         # TODO Remove the "allow_unsigned_extensions" config when https://github.com/duckdb/duckdb_aws/pull/49 is merged
         self._conn = duckdb.connect(db_location, config={"allow_unsigned_extensions": True})
