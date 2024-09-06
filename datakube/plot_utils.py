@@ -1,6 +1,7 @@
 import typing as T
 from datetime import timedelta
 
+import colorcet as cc
 import numpy as np
 import pandas as pd
 from bokeh.layouts import gridplot
@@ -12,25 +13,23 @@ from bokeh.models import HoverTool
 from bokeh.models import NumeralTickFormatter
 from bokeh.models import Range1d
 from bokeh.models import ResetTool
-from bokeh.palettes import inferno
-from bokeh.palettes import tol
 from bokeh.plotting import figure
 from bokeh.plotting import show
 
-_PALETTE_NAME = "TolRainbow"
-_MIN_PALETTE_SIZE = 3
-_MAX_PALETTE_SIZE = 23
 _MARGIN_FACTOR = 1.1
 
 _HOVER_JS = """
 export default (args, obj, data, context) => {
-    const tooltips = [];
     const x = Math.floor(data.geometry.x);
+    const tooltips = [`${args.source.data['normalized_ts_str'][x]}`];
 
     const seriesNames = Object.keys(args.source.data).filter(key => key !== 'PLACEHOLDER');
     for (let i = 0; i < seriesNames.length; i++) {
         const color = args.colors[i];
-        const series = seriesNames[i]
+        const series = seriesNames[i];
+        if (series == 'normalized_ts_str') {
+            continue;
+        }
         tooltips.push(`<strong style="color: ${color}">${series}</strong>: ${args.source.data[series][x]}`);
     }
     obj.tooltips = tooltips.join("<br>");
@@ -58,7 +57,13 @@ def plot_histogram(counts: np.ndarray, bins: np.ndarray) -> None:
     show(p)
 
 
-def plot_multiseries(dfs: T.Mapping[str, pd.DataFrame], *, stack: bool = False, ncols: int = 3) -> None:
+def plot_multiseries(
+    dfs: T.Mapping[str, pd.DataFrame],
+    *,
+    stack: bool = False,
+    ncols: int = 3,
+    color_palette: T.Optional[str] = None,
+) -> None:
     plots = []
     for title, df in dfs.items():
         p = new_figure()
@@ -68,14 +73,18 @@ def plot_multiseries(dfs: T.Mapping[str, pd.DataFrame], *, stack: bool = False, 
         (xmin, xmax, ymin, ymax) = _compute_extents(df, stack=stack)
         p.x_range = Range1d(xmin, xmax * 1.05)  # type: ignore
         p.y_range = Range1d(ymin, ymax * 1.05)  # type: ignore
+
+        df["normalized_ts_str"] = pd.to_timedelta(df.index, unit="s").map(
+            lambda td: f"{td.components.minutes}:{td.components.seconds}"
+        )
         src = ColumnDataSource(df)
 
         keys = list(df.columns)
-        ncolors = max(len(keys), _MIN_PALETTE_SIZE)
-        if ncolors > _MAX_PALETTE_SIZE:
-            colors = inferno(ncolors)
+        ncolors = len(keys)
+        if color_palette is None:
+            colors = cc.glasbey_dark[:ncolors]
         else:
-            colors = tol[_PALETTE_NAME][ncolors][: len(keys)]
+            colors = getattr(cc, color_palette)[:ncolors]
 
         if not stack:
             _add_ts_lines(src, df.index.name, keys, p, colors)

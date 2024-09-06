@@ -108,6 +108,24 @@ class DataKubeRelation:
         )
         return self
 
+    def rate(self, rate_secs: int) -> T.Self:
+        self._rel = self._rel.query(
+            "total",
+            f"""
+            SELECT *,
+                last_value(value) OVER rate_window AS last,
+                first_value(value) OVER rate_window AS first,
+                IF(last >= first, last - first, last) / {rate_secs} AS rate
+            FROM total
+            WINDOW rate_window AS (
+                PARTITION BY sim
+                ORDER BY timestamp
+                ROWS BETWEEN {rate_secs} PRECEDING AND CURRENT ROW
+            )
+        """,
+        )
+        return self
+
     def split(self, on: str = "sim") -> T.Mapping[str, "DataKubeRelation"]:
         return {
             value[0]: DataKubeRelation(self._rel.filter(f"{on}='{value[0]}'"), self._conn, self._grouper)
@@ -116,7 +134,8 @@ class DataKubeRelation:
 
     def to_pivot_table(
         self,
-        column: str = "sim",
+        pivot_column: str = "sim",
+        value_column: str = "value",
         aggfunc: str = "sum",
         max_time: T.Optional[timedelta] = None,
         fill_value: T.Optional[float] = 0.0,
@@ -132,7 +151,10 @@ class DataKubeRelation:
 
         df = (
             self._conn.query(
-                f"PIVOT to_pivot ON {column} USING {aggfunc}(value) GROUP BY {NORM_TS_KEY} ORDER BY {NORM_TS_KEY}"
+                f"""
+                PIVOT to_pivot ON {pivot_column} USING {aggfunc}({value_column})
+                GROUP BY {NORM_TS_KEY} ORDER BY {NORM_TS_KEY}
+                """
             )
             .df()
             .set_index(NORM_TS_KEY)
@@ -143,6 +165,10 @@ class DataKubeRelation:
             df = df.fillna(fill_value)
 
         return df
+
+    def unique(self, extra_cols: T.List[str] = list()) -> T.Self:
+        self._rel = self._rel.select(f"DISTINCT {self._grouper}, {','.join(extra_cols)}")
+        return self
 
     def with_any_container(self) -> T.Self:
         self._rel = self._rel.filter("container != ''")

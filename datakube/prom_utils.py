@@ -24,8 +24,7 @@ class PromReader:
             os.makedirs(cache_location, exist_ok=True)
             db_location = f"{cache_location}/{CACHED_DB_FILE}"
 
-        # TODO Remove the "allow_unsigned_extensions" config when https://github.com/duckdb/duckdb_aws/pull/49 is merged
-        self._conn = duckdb.connect(db_location, config={"allow_unsigned_extensions": True})
+        self._conn = duckdb.connect(db_location)
         self._conn.query("CREATE SECRET(TYPE S3, PROVIDER CREDENTIAL_CHAIN)")
 
         # Flatten the (single-element) tuples returned from the query
@@ -49,41 +48,57 @@ class PromReader:
         self._conn.query(f"CREATE TABLE {metric_name} AS SELECT * FROM read_parquet('{path}')")
         self._tables.add(metric_name)
 
-    # def compute_pod_owners_map(self) -> pd.DataFrame:
-    #     pod_owners = self.metric_to_df("kube_pod_owner")
-    #     pod_owners = extract_labels_to_columns(pod_owners, ["owner_name", "owner_kind"])
-    #     pod_owners.drop_duplicates(subset="pod", inplace=True, ignore_index=True)
+    def compute_pod_owners_map(self, namespace: str) -> DuckDBPyRelation:
+        pod_owners = (
+            self.query_metric("kube_pod_owner", "pod")
+            .extract_label("owner_name")
+            .extract_label("owner_kind")
+            .with_namespace(namespace)
+            .unique(["owner_name", "owner_kind"])
+            .df()
+            .drop_duplicates(subset="pod", ignore_index=True)
+        )
+        rs_owners = (
+            self.query_metric("kube_replicaset_owner", "replicaset")
+            .extract_label("replicaset")
+            .extract_label("owner_name")
+            .with_namespace(namespace)
+            .unique(["owner_name"])
+            .df()
+            .drop_duplicates(subset="replicaset", ignore_index=True)
+        )
+        job_owners = (
+            self.query_metric("kube_job_owner", "job")
+            .extract_label("job_name", "job")
+            .extract_label("owner_name")
+            .with_namespace(namespace)
+            .unique(["owner_name"])
+            .df()
+            .drop_duplicates(subset="job", ignore_index=True)
+        )
 
-    #     rs_owners = self.metric_to_df("kube_replicaset_owner")
-    #     rs_owners = extract_labels_to_columns(rs_owners, ["replicaset", "owner_name"])
-    #     rs_owners.drop_duplicates(subset="replicaset", inplace=True, ignore_index=True)
+        pod_owners = pod_owners.merge(
+            rs_owners,
+            how="left",
+            left_on=["owner_name"],
+            right_on=["replicaset"],
+            suffixes=(None, "_rs"),
+        )
 
-    #     job_owners = self.metric_to_df("kube_job_owner")
-    #     job_owners = extract_labels_to_columns(job_owners, ["job_name", "owner_name"])
-    #     job_owners.drop_duplicates(subset="job_name", inplace=True, ignore_index=True)
+        pod_owners = pod_owners.merge(
+            job_owners,
+            how="left",
+            left_on=["owner_name"],
+            right_on=["job"],
+            suffixes=(None, "_job"),
+        )
 
-    #     pod_owners = pod_owners.merge(
-    #         rs_owners,
-    #         how="left",
-    #         left_on=["owner_name", "namespace"],
-    #         right_on=["replicaset", "namespace"],
-    #         suffixes=(None, "_rs"),
-    #     )
+        # The only owner metrics exposed by kube-state-metrics are pod, job, and rs:
+        # it's possible other things also have nested ownership, but we're not worried
+        # about those right now -- the standard k8s things (StatefulSets, DaemonSets,
+        # static pods) have fixed owners so we just copy those values over
+        pod_owners["root_owner"] = (
+            pod_owners["owner_name_rs"].fillna(pod_owners["owner_name_job"]).fillna(pod_owners["owner_name"])
+        )
 
-    #     pod_owners = pod_owners.merge(
-    #         job_owners,
-    #         how="left",
-    #         left_on=["owner_name", "namespace"],
-    #         right_on=["job_name", "namespace"],
-    #         suffixes=(None, "_job"),
-    #     )
-
-    #     # The only owner metrics exposed by kube-state-metrics are pod, job, and rs:
-    #     # it's possible other things also have nested ownership, but we're not worried
-    #     # about those right now -- the standard k8s things (StatefulSets, DaemonSets,
-    #     # static pods) have fixed owners so we just copy those values over
-    #     pod_owners["root_owner"] = (
-    #         pod_owners["owner_name_rs"].fillna(pod_owners["owner_name_job"]).fillna(pod_owners["owner_name"])
-    #     )
-
-    #     return pod_owners[["pod", "namespace", "root_owner"]]
+        return pod_owners[["pod", "root_owner"]]
